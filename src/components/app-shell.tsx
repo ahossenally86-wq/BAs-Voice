@@ -129,7 +129,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </main>
 
         <nav
-          className="sticky bottom-0 z-10 grid grid-cols-5 border-t border-border bg-card md:hidden"
+          className="sticky bottom-0 z-10 grid grid-cols-6 border-t border-border bg-card md:hidden"
           aria-label="Bottom navigation"
         >
           {NAV.map((item) => {
