@@ -374,10 +374,10 @@ function PhraseEditor({
   open: boolean;
   onOpenChange: (o: boolean) => void;
   initial: CustomPrompt | null;
-  onSave: (data: { text: string; category: PromptCategory; tags: string[]; shortcut?: string }) => void;
+  onSave: (data: { text: string; categories: PromptCategory[]; tags: string[]; shortcut?: string }) => void;
 }) {
   const [text, setText] = useState("");
-  const [category, setCategory] = useState<PromptCategory>(CATEGORIES[0]);
+  const [categories, setCategories] = useState<PromptCategory[]>([CATEGORIES[0]]);
   const [tags, setTags] = useState("");
   const [shortcut, setShortcut] = useState("");
 
@@ -385,11 +385,19 @@ function PhraseEditor({
   useEffect(() => {
     if (open) {
       setText(initial?.text ?? "");
-      setCategory(initial?.category ?? CATEGORIES[0]);
+      setCategories(initial?.categories ?? (initial ? [initial.category] : [CATEGORIES[0]]));
       setTags(initial?.tags.join(", ") ?? "");
       setShortcut(initial?.shortcut ?? "");
     }
   }, [open, initial]);
+
+  const allSelected = categories.length === CATEGORIES.length;
+  function toggleCategory(c: PromptCategory) {
+    setCategories((arr) => (arr.includes(c) ? arr.filter((x) => x !== c) : [...arr, c]));
+  }
+  function toggleSelectAll() {
+    setCategories(allSelected ? [] : [...CATEGORIES]);
+  }
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -398,9 +406,13 @@ function PhraseEditor({
       toast.error("Phrase text is required");
       return;
     }
+    if (categories.length === 0) {
+      toast.error("Pick at least one category");
+      return;
+    }
     onSave({
       text: t,
-      category,
+      categories,
       tags: tags
         .split(",")
         .map((x) => x.trim().replace(/^#/, ""))
