@@ -28,6 +28,7 @@ export const Route = createFileRoute("/library")({
 
 interface CustomPrompt extends Prompt {
   custom: true;
+  categories: PromptCategory[];
 }
 
 function Library() {
