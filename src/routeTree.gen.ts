@@ -9,9 +9,33 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SummaryRouteImport } from './routes/summary'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ResponsesRouteImport } from './routes/responses'
+import { Route as MeetingRouteImport } from './routes/meeting'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as IndexRouteImport } from './routes/index'
 
+const SummaryRoute = SummaryRouteImport.update({
+  id: '/summary',
+  path: '/summary',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResponsesRoute = ResponsesRouteImport.update({
+  id: '/responses',
+  path: '/responses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MeetingRoute = MeetingRouteImport.update({
+  id: '/meeting',
+  path: '/meeting',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LibraryRoute = LibraryRouteImport.update({
   id: '/library',
   path: '/library',
@@ -26,31 +50,88 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/library': typeof LibraryRoute
+  '/meeting': typeof MeetingRoute
+  '/responses': typeof ResponsesRoute
+  '/settings': typeof SettingsRoute
+  '/summary': typeof SummaryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/library': typeof LibraryRoute
+  '/meeting': typeof MeetingRoute
+  '/responses': typeof ResponsesRoute
+  '/settings': typeof SettingsRoute
+  '/summary': typeof SummaryRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/library': typeof LibraryRoute
+  '/meeting': typeof MeetingRoute
+  '/responses': typeof ResponsesRoute
+  '/settings': typeof SettingsRoute
+  '/summary': typeof SummaryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/library'
+  fullPaths:
+    | '/'
+    | '/library'
+    | '/meeting'
+    | '/responses'
+    | '/settings'
+    | '/summary'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/library'
-  id: '__root__' | '/' | '/library'
+  to: '/' | '/library' | '/meeting' | '/responses' | '/settings' | '/summary'
+  id:
+    | '__root__'
+    | '/'
+    | '/library'
+    | '/meeting'
+    | '/responses'
+    | '/settings'
+    | '/summary'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LibraryRoute: typeof LibraryRoute
+  MeetingRoute: typeof MeetingRoute
+  ResponsesRoute: typeof ResponsesRoute
+  SettingsRoute: typeof SettingsRoute
+  SummaryRoute: typeof SummaryRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/summary': {
+      id: '/summary'
+      path: '/summary'
+      fullPath: '/summary'
+      preLoaderRoute: typeof SummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/responses': {
+      id: '/responses'
+      path: '/responses'
+      fullPath: '/responses'
+      preLoaderRoute: typeof ResponsesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/meeting': {
+      id: '/meeting'
+      path: '/meeting'
+      fullPath: '/meeting'
+      preLoaderRoute: typeof MeetingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/library': {
       id: '/library'
       path: '/library'
@@ -71,6 +152,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LibraryRoute: LibraryRoute,
+  MeetingRoute: MeetingRoute,
+  ResponsesRoute: ResponsesRoute,
+  SettingsRoute: SettingsRoute,
+  SummaryRoute: SummaryRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
