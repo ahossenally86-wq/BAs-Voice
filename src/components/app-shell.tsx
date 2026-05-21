@@ -8,6 +8,7 @@ import {
   Moon,
   Sun,
   Sparkles,
+  Zap,
 } from "lucide-react";
 import { useTheme } from "../hooks/use-theme";
 import { cn } from "../lib/utils";
@@ -21,9 +22,10 @@ type NavItem = {
 
 const NAV: NavItem[] = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/library", label: "Question Library", icon: BookOpen },
-  { to: "/meeting", label: "Meeting Mode", icon: Radio },
-  { to: "/summary", label: "Notes & Summary", icon: FileText },
+  { to: "/library", label: "Library", icon: BookOpen },
+  { to: "/meeting", label: "Meeting", icon: Radio },
+  { to: "/responses", label: "Responses", icon: Zap },
+  { to: "/summary", label: "Summary", icon: FileText },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 
