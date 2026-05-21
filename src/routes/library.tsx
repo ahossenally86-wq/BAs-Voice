@@ -46,27 +46,35 @@ function Library() {
 
   const allPrompts = useMemo<Prompt[]>(() => [...custom, ...PROMPTS], [custom]);
 
+  const categoriesOf = (p: Prompt): PromptCategory[] => {
+    const c = custom.find((x) => x.id === p.id);
+    return c ? c.categories : [p.category];
+  };
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return allPrompts.filter((p) => {
-      if (search.category && p.category !== search.category) return false;
+      const cats = categoriesOf(p);
+      if (search.category && !cats.includes(search.category as PromptCategory)) return false;
       if (!q) return true;
       return (
         p.text.toLowerCase().includes(q) ||
         p.tags.some((t) => t.toLowerCase().includes(q)) ||
-        p.category.toLowerCase().includes(q) ||
+        cats.some((c) => c.toLowerCase().includes(q)) ||
         (p.shortcut ?? "").includes(q)
       );
     });
-  }, [query, search.category, allPrompts]);
+  }, [query, search.category, allPrompts, custom]);
 
   const grouped = useMemo(() => {
     const map: Record<string, Prompt[]> = {};
     for (const p of filtered) {
-      (map[p.category] ||= []).push(p);
+      for (const c of categoriesOf(p)) {
+        (map[c] ||= []).push(p);
+      }
     }
     return map;
-  }, [filtered]);
+  }, [filtered, custom]);
 
   const isCustom = (id: string) => custom.some((c) => c.id === id);
 
