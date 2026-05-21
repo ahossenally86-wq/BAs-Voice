@@ -12,13 +12,20 @@ import {
 import { useTheme } from "../hooks/use-theme";
 import { cn } from "../lib/utils";
 
-const NAV = [
+type NavItem = {
+  to: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  end?: boolean;
+};
+
+const NAV: NavItem[] = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/library", label: "Question Library", icon: BookOpen },
   { to: "/meeting", label: "Meeting Mode", icon: Radio },
   { to: "/summary", label: "Notes & Summary", icon: FileText },
   { to: "/settings", label: "Settings", icon: Settings },
-] as const;
+];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { theme, toggle } = useTheme();
