@@ -445,36 +445,63 @@ function PhraseEditor({
               className="w-full rounded-lg border border-input bg-card px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground"
             />
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <label htmlFor="ph-cat" className="text-xs font-medium">
-                Category
-              </label>
-              <select
-                id="ph-cat"
-                value={category}
-                onChange={(e) => setCategory(e.target.value as PromptCategory)}
-                className="h-10 w-full rounded-lg border border-input bg-card px-2 text-sm shadow-sm"
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium">
+                Categories{" "}
+                <span className="text-muted-foreground">
+                  ({categories.length} selected)
+                </span>
+              </span>
+              <button
+                type="button"
+                onClick={toggleSelectAll}
+                className="text-xs font-medium text-primary hover:underline"
               >
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
+                {allSelected ? "Clear all" : "Select all"}
+              </button>
+            </div>
+            <div
+              role="group"
+              aria-label="Categories"
+              className="flex flex-wrap gap-1.5 rounded-lg border border-input bg-card p-2"
+            >
+              {CATEGORIES.map((c) => {
+                const active = categories.includes(c);
+                return (
+                  <label
+                    key={c}
+                    className={cn(
+                      "inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                      active
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground",
+                    )}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={active}
+                      onChange={() => toggleCategory(c)}
+                      className="sr-only"
+                    />
+                    {active && <Check className="h-3 w-3" aria-hidden="true" />}
                     {c}
-                  </option>
-                ))}
-              </select>
+                  </label>
+                );
+              })}
             </div>
-            <div className="space-y-1.5">
-              <label htmlFor="ph-short" className="text-xs font-medium">
-                Shortcut <span className="text-muted-foreground">(optional)</span>
-              </label>
-              <input
-                id="ph-short"
-                value={shortcut}
-                onChange={(e) => setShortcut(e.target.value)}
-                placeholder="e.g. dc"
-                className="h-10 w-full rounded-lg border border-input bg-card px-3 text-sm shadow-sm placeholder:text-muted-foreground"
-              />
-            </div>
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="ph-short" className="text-xs font-medium">
+              Shortcut <span className="text-muted-foreground">(optional)</span>
+            </label>
+            <input
+              id="ph-short"
+              value={shortcut}
+              onChange={(e) => setShortcut(e.target.value)}
+              placeholder="e.g. dc"
+              className="h-10 w-full rounded-lg border border-input bg-card px-3 text-sm shadow-sm placeholder:text-muted-foreground"
+            />
           </div>
           <div className="space-y-1.5">
             <label htmlFor="ph-tags" className="text-xs font-medium">
