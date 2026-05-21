@@ -114,16 +114,34 @@ function Library() {
   }
   function savePrompt(data: {
     text: string;
-    category: PromptCategory;
+    categories: PromptCategory[];
     tags: string[];
     shortcut?: string;
   }) {
+    const primary = data.categories[0] ?? CATEGORIES[0];
     if (editing) {
-      setCustom((arr) => arr.map((c) => (c.id === editing.id ? { ...c, ...data } : c)));
+      setCustom((arr) =>
+        arr.map((c) =>
+          c.id === editing.id
+            ? { ...c, text: data.text, categories: data.categories, category: primary, tags: data.tags, shortcut: data.shortcut }
+            : c,
+        ),
+      );
       toast.success("Phrase updated");
     } else {
       const id = `c_${Date.now().toString(36)}`;
-      setCustom((arr) => [{ id, custom: true, ...data }, ...arr]);
+      setCustom((arr) => [
+        {
+          id,
+          custom: true,
+          text: data.text,
+          categories: data.categories,
+          category: primary,
+          tags: data.tags,
+          shortcut: data.shortcut,
+        },
+        ...arr,
+      ]);
       toast.success("Phrase added to library");
     }
     setEditorOpen(false);
