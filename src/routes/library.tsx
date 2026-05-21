@@ -28,6 +28,7 @@ export const Route = createFileRoute("/library")({
 
 interface CustomPrompt extends Prompt {
   custom: true;
+  categories: PromptCategory[];
 }
 
 function Library() {
@@ -45,27 +46,35 @@ function Library() {
 
   const allPrompts = useMemo<Prompt[]>(() => [...custom, ...PROMPTS], [custom]);
 
+  const categoriesOf = (p: Prompt): PromptCategory[] => {
+    const c = custom.find((x) => x.id === p.id);
+    return c ? c.categories : [p.category];
+  };
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return allPrompts.filter((p) => {
-      if (search.category && p.category !== search.category) return false;
+      const cats = categoriesOf(p);
+      if (search.category && !cats.includes(search.category as PromptCategory)) return false;
       if (!q) return true;
       return (
         p.text.toLowerCase().includes(q) ||
         p.tags.some((t) => t.toLowerCase().includes(q)) ||
-        p.category.toLowerCase().includes(q) ||
+        cats.some((c) => c.toLowerCase().includes(q)) ||
         (p.shortcut ?? "").includes(q)
       );
     });
-  }, [query, search.category, allPrompts]);
+  }, [query, search.category, allPrompts, custom]);
 
   const grouped = useMemo(() => {
     const map: Record<string, Prompt[]> = {};
     for (const p of filtered) {
-      (map[p.category] ||= []).push(p);
+      for (const c of categoriesOf(p)) {
+        (map[c] ||= []).push(p);
+      }
     }
     return map;
-  }, [filtered]);
+  }, [filtered, custom]);
 
   const isCustom = (id: string) => custom.some((c) => c.id === id);
 
@@ -105,16 +114,34 @@ function Library() {
   }
   function savePrompt(data: {
     text: string;
-    category: PromptCategory;
+    categories: PromptCategory[];
     tags: string[];
     shortcut?: string;
   }) {
+    const primary = data.categories[0] ?? CATEGORIES[0];
     if (editing) {
-      setCustom((arr) => arr.map((c) => (c.id === editing.id ? { ...c, ...data } : c)));
+      setCustom((arr) =>
+        arr.map((c) =>
+          c.id === editing.id
+            ? { ...c, text: data.text, categories: data.categories, category: primary, tags: data.tags, shortcut: data.shortcut }
+            : c,
+        ),
+      );
       toast.success("Phrase updated");
     } else {
       const id = `c_${Date.now().toString(36)}`;
-      setCustom((arr) => [{ id, custom: true, ...data }, ...arr]);
+      setCustom((arr) => [
+        {
+          id,
+          custom: true,
+          text: data.text,
+          categories: data.categories,
+          category: primary,
+          tags: data.tags,
+          shortcut: data.shortcut,
+        },
+        ...arr,
+      ]);
       toast.success("Phrase added to library");
     }
     setEditorOpen(false);
@@ -347,10 +374,10 @@ function PhraseEditor({
   open: boolean;
   onOpenChange: (o: boolean) => void;
   initial: CustomPrompt | null;
-  onSave: (data: { text: string; category: PromptCategory; tags: string[]; shortcut?: string }) => void;
+  onSave: (data: { text: string; categories: PromptCategory[]; tags: string[]; shortcut?: string }) => void;
 }) {
   const [text, setText] = useState("");
-  const [category, setCategory] = useState<PromptCategory>(CATEGORIES[0]);
+  const [categories, setCategories] = useState<PromptCategory[]>([CATEGORIES[0]]);
   const [tags, setTags] = useState("");
   const [shortcut, setShortcut] = useState("");
 
@@ -358,11 +385,19 @@ function PhraseEditor({
   useEffect(() => {
     if (open) {
       setText(initial?.text ?? "");
-      setCategory(initial?.category ?? CATEGORIES[0]);
+      setCategories(initial?.categories ?? (initial ? [initial.category] : [CATEGORIES[0]]));
       setTags(initial?.tags.join(", ") ?? "");
       setShortcut(initial?.shortcut ?? "");
     }
   }, [open, initial]);
+
+  const allSelected = categories.length === CATEGORIES.length;
+  function toggleCategory(c: PromptCategory) {
+    setCategories((arr) => (arr.includes(c) ? arr.filter((x) => x !== c) : [...arr, c]));
+  }
+  function toggleSelectAll() {
+    setCategories(allSelected ? [] : [...CATEGORIES]);
+  }
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -371,9 +406,13 @@ function PhraseEditor({
       toast.error("Phrase text is required");
       return;
     }
+    if (categories.length === 0) {
+      toast.error("Pick at least one category");
+      return;
+    }
     onSave({
       text: t,
-      category,
+      categories,
       tags: tags
         .split(",")
         .map((x) => x.trim().replace(/^#/, ""))
@@ -406,36 +445,63 @@ function PhraseEditor({
               className="w-full rounded-lg border border-input bg-card px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground"
             />
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <label htmlFor="ph-cat" className="text-xs font-medium">
-                Category
-              </label>
-              <select
-                id="ph-cat"
-                value={category}
-                onChange={(e) => setCategory(e.target.value as PromptCategory)}
-                className="h-10 w-full rounded-lg border border-input bg-card px-2 text-sm shadow-sm"
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium">
+                Categories{" "}
+                <span className="text-muted-foreground">
+                  ({categories.length} selected)
+                </span>
+              </span>
+              <button
+                type="button"
+                onClick={toggleSelectAll}
+                className="text-xs font-medium text-primary hover:underline"
               >
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
+                {allSelected ? "Clear all" : "Select all"}
+              </button>
+            </div>
+            <div
+              role="group"
+              aria-label="Categories"
+              className="flex flex-wrap gap-1.5 rounded-lg border border-input bg-card p-2"
+            >
+              {CATEGORIES.map((c) => {
+                const active = categories.includes(c);
+                return (
+                  <label
+                    key={c}
+                    className={cn(
+                      "inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                      active
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground",
+                    )}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={active}
+                      onChange={() => toggleCategory(c)}
+                      className="sr-only"
+                    />
+                    {active && <Check className="h-3 w-3" aria-hidden="true" />}
                     {c}
-                  </option>
-                ))}
-              </select>
+                  </label>
+                );
+              })}
             </div>
-            <div className="space-y-1.5">
-              <label htmlFor="ph-short" className="text-xs font-medium">
-                Shortcut <span className="text-muted-foreground">(optional)</span>
-              </label>
-              <input
-                id="ph-short"
-                value={shortcut}
-                onChange={(e) => setShortcut(e.target.value)}
-                placeholder="e.g. dc"
-                className="h-10 w-full rounded-lg border border-input bg-card px-3 text-sm shadow-sm placeholder:text-muted-foreground"
-              />
-            </div>
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="ph-short" className="text-xs font-medium">
+              Shortcut <span className="text-muted-foreground">(optional)</span>
+            </label>
+            <input
+              id="ph-short"
+              value={shortcut}
+              onChange={(e) => setShortcut(e.target.value)}
+              placeholder="e.g. dc"
+              className="h-10 w-full rounded-lg border border-input bg-card px-3 text-sm shadow-sm placeholder:text-muted-foreground"
+            />
           </div>
           <div className="space-y-1.5">
             <label htmlFor="ph-tags" className="text-xs font-medium">
