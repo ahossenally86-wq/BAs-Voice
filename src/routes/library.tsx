@@ -355,7 +355,7 @@ function PhraseEditor({
   const [shortcut, setShortcut] = useState("");
 
   // Reset form whenever the dialog opens
-  useMemo(() => {
+  useEffect(() => {
     if (open) {
       setText(initial?.text ?? "");
       setCategory(initial?.category ?? CATEGORIES[0]);
