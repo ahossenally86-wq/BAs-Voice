@@ -348,6 +348,18 @@ function Library() {
                                 aria-hidden="true"
                               />
                             </IconBtn>
+                            {speechSupported && (
+                              <IconBtn
+                                label={speakingId === p.id ? "Stop speaking" : "Speak phrase"}
+                                onClick={() => speakPrompt(p)}
+                              >
+                                {speakingId === p.id ? (
+                                  <Square className="h-4 w-4 text-primary" aria-hidden="true" />
+                                ) : (
+                                  <Volume2 className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                                )}
+                              </IconBtn>
+                            )}
                             <IconBtn label="Copy" onClick={() => copyPrompt(p)}>
                               {copied ? (
                                 <Check className="h-4 w-4 text-success" aria-hidden="true" />
