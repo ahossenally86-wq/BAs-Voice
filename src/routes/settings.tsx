@@ -57,6 +57,73 @@ function Settings() {
           />
         </Card>
 
+        <Card title="Voice (text-to-speech)" icon={Volume2}>
+          {!speechSupported ? (
+            <p className="text-sm text-muted-foreground">
+              Your browser does not support speech synthesis.
+            </p>
+          ) : (
+            <div className="space-y-4">
+              <Toggle
+                label="Speak prompts aloud in Meeting Mode"
+                checked={speech.enabled}
+                onChange={(v) => setSpeech({ ...speech, enabled: v })}
+              />
+              <div className="space-y-1.5">
+                <label htmlFor="voice-select" className="text-xs font-medium">
+                  Voice
+                </label>
+                <select
+                  id="voice-select"
+                  value={speech.voiceURI ?? ""}
+                  onChange={(e) =>
+                    setSpeech({ ...speech, voiceURI: e.target.value || null })
+                  }
+                  className="w-full rounded-md border border-input bg-card px-2 py-1.5 text-sm shadow-sm"
+                >
+                  <option value="">System default</option>
+                  {voices.map((v) => (
+                    <option key={v.voiceURI} value={v.voiceURI}>
+                      {v.name} — {v.lang}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <Slider
+                label="Speed"
+                value={speech.rate}
+                min={0.5}
+                max={1.6}
+                step={0.05}
+                onChange={(v) => setSpeech({ ...speech, rate: v })}
+                format={(v) => `${v.toFixed(2)}×`}
+              />
+              <Slider
+                label="Pitch"
+                value={speech.pitch}
+                min={0.5}
+                max={1.6}
+                step={0.05}
+                onChange={(v) => setSpeech({ ...speech, pitch: v })}
+                format={(v) => v.toFixed(2)}
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  speak(
+                    "This is how Voice Assist will sound in your meetings.",
+                    { force: true },
+                  )
+                }
+                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:border-primary/40"
+              >
+                <Play className="h-3.5 w-3.5" aria-hidden="true" />
+                Preview voice
+              </button>
+            </div>
+          )}
+        </Card>
+
         <Card title="Keyboard shortcuts" icon={Keyboard}>
           <dl className="grid gap-2 text-sm sm:grid-cols-2">
             <Shortcut keys={["Tab"]} desc="Expand quick response" />
