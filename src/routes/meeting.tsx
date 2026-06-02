@@ -44,6 +44,7 @@ function MeetingMode() {
   const [inputKind, setInputKind] = useState<"note" | "action" | "decision">("note");
   const [actionOwner, setActionOwner] = useState("");
   const [responsePanel, setResponsePanel] = useState<string | null>(null);
+  const { speak, supported: speechSupported } = useSpeech();
 
   // Timer
   const [running, setRunning] = useState(false);
