@@ -69,7 +69,8 @@ function MeetingMode() {
   function sendPrompt(p: Prompt) {
     setResponsePanel(p.text);
     setTimeout(() => setResponsePanel(null), 2400);
-    toast.success("Sent to meeting", { duration: 1500 });
+    const spoke = speak(p.text);
+    toast.success(spoke ? "Speaking…" : "Sent to meeting", { duration: 1500 });
   }
 
   function addItem() {
