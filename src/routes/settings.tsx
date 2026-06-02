@@ -12,6 +12,8 @@ export const Route = createFileRoute("/settings")({
 function Settings() {
   const { theme, setTheme } = useTheme();
   const { highContrast, setHighContrast, reduceMotion, setReduceMotion } = useA11ySettings();
+  const { settings: speech, setSettings: setSpeech } = useSpeechSettings();
+  const { speak, voices, supported: speechSupported } = useSpeech();
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 lg:px-10">
