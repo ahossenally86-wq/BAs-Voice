@@ -44,6 +44,27 @@ function Library() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState<CustomPrompt | null>(null);
+  const { speak, stop, speaking, supported: speechSupported } = useSpeech();
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
+
+  function speakPrompt(p: Prompt) {
+    if (speakingId === p.id && speaking) {
+      stop();
+      setSpeakingId(null);
+      return;
+    }
+    const ok = speak(p.text, { force: true });
+    if (ok) {
+      setSpeakingId(p.id);
+      track(p.id);
+    } else {
+      toast.error("Speech not available in this browser");
+    }
+  }
+
+  useEffect(() => {
+    if (!speaking) setSpeakingId(null);
+  }, [speaking]);
 
   const allPrompts = useMemo<Prompt[]>(() => [...custom, ...PROMPTS], [custom]);
 
