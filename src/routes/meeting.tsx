@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { PageHeader } from "../components/page-header";
 import { CATEGORIES, PROMPTS, type Prompt, type PromptCategory } from "../lib/mock-data";
 import { useLocalStorage } from "../hooks/use-local-storage";
+import { useSpeech } from "../hooks/use-speech";
 import { cn, formatDuration } from "../lib/utils";
 
 export const Route = createFileRoute("/meeting")({
