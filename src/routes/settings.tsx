@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Moon, Sun, Contrast, MousePointerClick, Keyboard, ShieldCheck } from "lucide-react";
+import { Moon, Sun, Contrast, MousePointerClick, Keyboard, ShieldCheck, Volume2, Play } from "lucide-react";
 import { PageHeader } from "../components/page-header";
 import { useA11ySettings, useTheme } from "../hooks/use-theme";
+import { useSpeech, useSpeechSettings } from "../hooks/use-speech";
 import { cn } from "../lib/utils";
 
 export const Route = createFileRoute("/settings")({
