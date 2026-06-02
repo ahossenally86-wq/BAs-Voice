@@ -1,11 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Copy, Send, Star, Search, ChevronDown, ChevronRight, Check, Plus, Pencil, Trash2 } from "lucide-react";
+import { Copy, Send, Star, Search, ChevronDown, ChevronRight, Check, Plus, Pencil, Trash2, Volume2, Square } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { PageHeader } from "../components/page-header";
 import { CATEGORIES, PROMPTS, type PromptCategory, type Prompt } from "../lib/mock-data";
 import { useLocalStorage } from "../hooks/use-local-storage";
+import { useSpeech } from "../hooks/use-speech";
 import { cn } from "../lib/utils";
 import {
   Dialog,
