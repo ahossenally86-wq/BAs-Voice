@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { PageHeader } from "../components/page-header";
 import { CATEGORIES, PROMPTS, type Prompt, type PromptCategory } from "../lib/mock-data";
 import { useLocalStorage } from "../hooks/use-local-storage";
+import { useSpeech } from "../hooks/use-speech";
 import { cn, formatDuration } from "../lib/utils";
 
 export const Route = createFileRoute("/meeting")({
@@ -43,6 +44,7 @@ function MeetingMode() {
   const [inputKind, setInputKind] = useState<"note" | "action" | "decision">("note");
   const [actionOwner, setActionOwner] = useState("");
   const [responsePanel, setResponsePanel] = useState<string | null>(null);
+  const { speak } = useSpeech();
 
   // Timer
   const [running, setRunning] = useState(false);
@@ -67,7 +69,8 @@ function MeetingMode() {
   function sendPrompt(p: Prompt) {
     setResponsePanel(p.text);
     setTimeout(() => setResponsePanel(null), 2400);
-    toast.success("Sent to meeting", { duration: 1500 });
+    const spoke = speak(p.text);
+    toast.success(spoke ? "Speaking…" : "Sent to meeting", { duration: 1500 });
   }
 
   function addItem() {

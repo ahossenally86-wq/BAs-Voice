@@ -1,11 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Copy, Send, Star, Search, ChevronDown, ChevronRight, Check, Plus, Pencil, Trash2 } from "lucide-react";
+import { Copy, Send, Star, Search, ChevronDown, ChevronRight, Check, Plus, Pencil, Trash2, Volume2, Square } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { PageHeader } from "../components/page-header";
 import { CATEGORIES, PROMPTS, type PromptCategory, type Prompt } from "../lib/mock-data";
 import { useLocalStorage } from "../hooks/use-local-storage";
+import { useSpeech } from "../hooks/use-speech";
 import { cn } from "../lib/utils";
 import {
   Dialog,
@@ -43,6 +44,27 @@ function Library() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState<CustomPrompt | null>(null);
+  const { speak, stop, speaking, supported: speechSupported } = useSpeech();
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
+
+  function speakPrompt(p: Prompt) {
+    if (speakingId === p.id && speaking) {
+      stop();
+      setSpeakingId(null);
+      return;
+    }
+    const ok = speak(p.text, { force: true });
+    if (ok) {
+      setSpeakingId(p.id);
+      track(p.id);
+    } else {
+      toast.error("Speech not available in this browser");
+    }
+  }
+
+  useEffect(() => {
+    if (!speaking) setSpeakingId(null);
+  }, [speaking]);
 
   const allPrompts = useMemo<Prompt[]>(() => [...custom, ...PROMPTS], [custom]);
 
@@ -326,6 +348,18 @@ function Library() {
                                 aria-hidden="true"
                               />
                             </IconBtn>
+                            {speechSupported && (
+                              <IconBtn
+                                label={speakingId === p.id ? "Stop speaking" : "Speak phrase"}
+                                onClick={() => speakPrompt(p)}
+                              >
+                                {speakingId === p.id ? (
+                                  <Square className="h-4 w-4 text-primary" aria-hidden="true" />
+                                ) : (
+                                  <Volume2 className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                                )}
+                              </IconBtn>
+                            )}
                             <IconBtn label="Copy" onClick={() => copyPrompt(p)}>
                               {copied ? (
                                 <Check className="h-4 w-4 text-success" aria-hidden="true" />

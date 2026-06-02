@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Moon, Sun, Contrast, MousePointerClick, Keyboard, ShieldCheck } from "lucide-react";
+import { Moon, Sun, Contrast, MousePointerClick, Keyboard, ShieldCheck, Volume2, Play } from "lucide-react";
 import { PageHeader } from "../components/page-header";
 import { useA11ySettings, useTheme } from "../hooks/use-theme";
+import { useSpeech, useSpeechSettings } from "../hooks/use-speech";
 import { cn } from "../lib/utils";
 
 export const Route = createFileRoute("/settings")({
@@ -11,6 +12,8 @@ export const Route = createFileRoute("/settings")({
 function Settings() {
   const { theme, setTheme } = useTheme();
   const { highContrast, setHighContrast, reduceMotion, setReduceMotion } = useA11ySettings();
+  const { settings: speech, setSettings: setSpeech } = useSpeechSettings();
+  const { speak, voices, supported: speechSupported } = useSpeech();
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 lg:px-10">
@@ -52,6 +55,73 @@ function Settings() {
             checked={reduceMotion}
             onChange={setReduceMotion}
           />
+        </Card>
+
+        <Card title="Voice (text-to-speech)" icon={Volume2}>
+          {!speechSupported ? (
+            <p className="text-sm text-muted-foreground">
+              Your browser does not support speech synthesis.
+            </p>
+          ) : (
+            <div className="space-y-4">
+              <Toggle
+                label="Speak prompts aloud in Meeting Mode"
+                checked={speech.enabled}
+                onChange={(v) => setSpeech({ ...speech, enabled: v })}
+              />
+              <div className="space-y-1.5">
+                <label htmlFor="voice-select" className="text-xs font-medium">
+                  Voice
+                </label>
+                <select
+                  id="voice-select"
+                  value={speech.voiceURI ?? ""}
+                  onChange={(e) =>
+                    setSpeech({ ...speech, voiceURI: e.target.value || null })
+                  }
+                  className="w-full rounded-md border border-input bg-card px-2 py-1.5 text-sm shadow-sm"
+                >
+                  <option value="">System default</option>
+                  {voices.map((v) => (
+                    <option key={v.voiceURI} value={v.voiceURI}>
+                      {v.name} — {v.lang}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <Slider
+                label="Speed"
+                value={speech.rate}
+                min={0.5}
+                max={1.6}
+                step={0.05}
+                onChange={(v) => setSpeech({ ...speech, rate: v })}
+                format={(v) => `${v.toFixed(2)}×`}
+              />
+              <Slider
+                label="Pitch"
+                value={speech.pitch}
+                min={0.5}
+                max={1.6}
+                step={0.05}
+                onChange={(v) => setSpeech({ ...speech, pitch: v })}
+                format={(v) => v.toFixed(2)}
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  speak(
+                    "This is how Voice Assist will sound in your meetings.",
+                    { force: true },
+                  )
+                }
+                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:border-primary/40"
+              >
+                <Play className="h-3.5 w-3.5" aria-hidden="true" />
+                Preview voice
+              </button>
+            </div>
+          )}
         </Card>
 
         <Card title="Keyboard shortcuts" icon={Keyboard}>
@@ -176,6 +246,45 @@ function Shortcut({ keys, desc }: { keys: string[]; desc: string }) {
           </kbd>
         ))}
       </span>
+    </div>
+  );
+}
+
+function Slider({
+  label,
+  value,
+  min,
+  max,
+  step,
+  onChange,
+  format,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  onChange: (v: number) => void;
+  format?: (v: number) => string;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between text-xs font-medium">
+        <span>{label}</span>
+        <span className="font-mono text-muted-foreground">
+          {format ? format(value) : value}
+        </span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(parseFloat(e.target.value))}
+        className="h-2 w-full cursor-pointer appearance-none rounded-full bg-muted accent-primary"
+        aria-label={label}
+      />
     </div>
   );
 }
