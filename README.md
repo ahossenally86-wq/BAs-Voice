@@ -1,4 +1,5 @@
-I have a friend that's lost her ability to speak. 
+I have a friend that's lost her ability to speak. Cancer. That horrible beast. 
+
 She's a Business Systems Analyst and a damn good one at that. 
 She's been worried about how she can go back to work without being able to collaborate and communicate. 
 I created this more to give her hope that there are things she can still do and that her brain, mind and character have unbelieveable value. 
