@@ -77,11 +77,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Voice Assist BSA — AI communication copilot" },
       { name: "description", content: "Voice Assist BSA is an accessibility-first AI copilot that helps non-verbal Business Systems Analysts facilitate meetings, capture decisions and stay in flow." },
       { name: "author", content: "Voice Assist" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Voice Assist BSA — AI communication copilot" },
+      { property: "og:description", content: "Voice Assist BSA is an accessibility-first AI copilot that helps non-verbal Business Systems Analysts facilitate meetings, capture decisions and stay in flow." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Voice Assist BSA — AI communication copilot" },
+      { name: "twitter:description", content: "Voice Assist BSA is an accessibility-first AI copilot that helps non-verbal Business Systems Analysts facilitate meetings, capture decisions and stay in flow." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/26d34783-782b-46bc-83d8-fb9b23c156b3/id-preview-3c65ecd6--6e852beb-79e7-44bb-ba25-32caaf63ccb9.lovable.app-1780398885006.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/26d34783-782b-46bc-83d8-fb9b23c156b3/id-preview-3c65ecd6--6e852beb-79e7-44bb-ba25-32caaf63ccb9.lovable.app-1780398885006.png" },
     ],
     links: [
       {
